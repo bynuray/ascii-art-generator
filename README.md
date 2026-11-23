@@ -34,10 +34,7 @@ g++ -std=c++17 -o ascii main.cpp
 ./ascii
 ```
 
-Put your `.pgm` file in the same folder and set its name in `main.cpp`. Two sample images are included:
-
-- `test.pgm`: a tiny 4×3 image for testing
-- `starry_night.pgm`: a grayscale version of *The Starry Night* by Vincent van Gogh
+Put your `.pgm` file in the same folder and set its name in `main.cpp`. A sample image is included: `starry_night.pgm`, a grayscale version of *The Starry Night* by Vincent van Gogh.
 
 ## How it works
 
