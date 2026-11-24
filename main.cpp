@@ -15,10 +15,14 @@ void Skip(ifstream &myFile) {
 		value=(char)myFile.peek();
 	}
 }
+int Start(int j, double scale) {
+	double res=j*scale;
+	return res;
+}
 
 int main() {
 	int counter(0);
-	ifstream myFile("test_missing_pixels.pgm");
+	ifstream myFile("starry_night_400.pgm");
 
 	if(!myFile.is_open()) {
 		cout<<"Could not open file";
@@ -61,19 +65,47 @@ int main() {
 				grid[i][j]=0;
 			}
 			else if(grid[i][j]>maxValue) {
-				
+
 				counter++;
 				grid[i][j]=maxValue;
 			}
 
 		}
 	}
-if(counter>0) {	cout<<"Warning: " << counter << " pixel(s) were out of range and clamped."<<endl;}
+	if(counter>0) {
+		cout<<"Warning: " << counter << " pixel(s) were out of range and clamped."<<endl;
+	}
 
+	int outputWidth(80);
+	if(outputWidth>width) {
+		outputWidth=width;
+	}
+	double scale=(double)width/(double)outputWidth;
+	int outputHeight = height / scale / 2;
+	if(outputheight<1) {
+		outputHeight=1;
+	}
+	double row_scale=(double)height/(double)outputHeight;
 
-	for(int i=0; i<height; i+=2) {
-		for(int j=0; j<width; j++) {
-			cout<<ramp[grid[i][j]*ramp.size()/(maxValue+1)];
+	for(int i=0; i<outputHeight; i++) {
+		int first_row=Start(i,row_scale);
+		int last_row=Start(i+1,row_scale)-1;
+		for(int j=0; j<outputWidth; j++) {
+			int sum(0),count(0);
+			int first=Start(j,scale);
+			int last=Start(j+1,scale)-1;
+
+			for (int y = first_row; y<=last_row; y++) {
+				for (int x = first; x<=last; x++) {
+					sum += grid[y][x];
+					count++;
+				}
+
+			}
+
+			int avg=sum/count;
+
+			cout<<ramp[avg*ramp.size()/(maxValue+1)];
 
 		}
 		cout<<endl;
