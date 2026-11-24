@@ -47,6 +47,16 @@ Put your `.pgm` file in the same folder and set its name in `main.cpp`. A sample
    ```
 5. **Fixes the proportions**: terminal characters are about twice as tall as they are wide, so the program prints every second row to keep the image's real shape.
 
+## Update: input validation
+
+The program now checks the file carefully instead of assuming it is correct:
+
+- **Header comments:** lines starting with `#` (which tools like GIMP add automatically) are skipped anywhere in the header, using a small `Skip()` function.
+- **Fail early:** the image type is checked right after it is read, before anything else.
+- **Valid header:** if width, height or maximum brightness is not a valid positive number, the program stops with `Invalid header in PGM file`.
+- **Missing pixels:** if the file runs out of pixel data, the program stops and reports the exact row and column.
+- **Out-of-range values:** pixels below `0` or above the maximum brightness are clamped to the valid range, and one warning shows how many pixels were changed.
+
 ## Future improvements
 
 This project will keep growing. Planned features:
@@ -54,7 +64,6 @@ This project will keep growing. Planned features:
 - **Color images**: support PPM files (`P3`) by converting each pixel's red, green and blue values to one brightness
 - **Binary formats**: support `P5` and `P6`, which most tools save by default
 - **PNG and JPG support**, so images don't need to be converted first
-- **Header comments**: skip lines starting with `#`, which tools like GIMP add automatically
 - **Automatic resizing**: let the user choose the output width, so any image size works
 - **Invert option** for light and dark terminal backgrounds
 - **Save the result** to a `.txt` file
