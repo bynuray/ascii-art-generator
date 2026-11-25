@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -20,9 +21,15 @@ int Start(int j, double scale) {
 	return res;
 }
 
-int main() {
+int main( int argc, char *argv[]) {
+	if(argc<2 ||argc>3) {
+		cout << "Usage: ./ascii <file.pgm> [width]" << endl;
+		cout << "Example: ./ascii starry_night.pgm 120" << endl;
+		return 1;
+	}
+
 	int counter(0);
-	ifstream myFile("starry_night.pgm");
+	ifstream myFile(argv[1]);
 
 	if(!myFile.is_open()) {
 		cout<<"Could not open file";
@@ -77,16 +84,43 @@ int main() {
 	}
 
 	int outputWidth(80);
+	if(argc>2) {
+	string w=argv[2];
+	
+	for(int i=0; i<w.size();i++){
+	    if(!isdigit(w[i])){
+	        cout<<"Width must be a positive whole number, e.g. 80"<<endl;
+	        return 1;
+	    }
+	}
+	try{
+	    
+		outputWidth=stoi(argv[2]);
+	
+	}
+	catch(...){
+	    cout<<"Please enter number"<<endl;
+	    return 1;
+	}    
+	}
+	
+	
+	
+    if(outputWidth<1) {
+		cout<<"Width must be a positive number (e.g. 80)."<<endl;
+		return 1;
+	}
 	if(outputWidth>width) {
 		outputWidth=width;
 	}
 	double scale=(double)width/(double)outputWidth;
 	int outputHeight = height / scale / 2;
-	if(outputheight<1) {
+	if(outputHeight<1) {
 		outputHeight=1;
 	}
 	double row_scale=(double)height/(double)outputHeight;
 
+cout<<outputHeight<<" "<<outputWidth<<endl;
 	for(int i=0; i<outputHeight; i++) {
 		int first_row=Start(i,row_scale);
 		int last_row=Start(i+1,row_scale)-1;
