@@ -35,18 +35,32 @@ You need a C++17 compiler.
 
 ```bash
 g++ -std=c++17 -o ascii main.cpp
-./ascii
+./ascii <file.pgm> [width]
 ```
 
-Put your `.pgm` file in the same folder and set its name in `main.cpp`. A sample image is included: `starry_night_400.pgm`, a 400 × 317 grayscale version of *The Starry Night* by Vincent van Gogh.
+- `<file.pgm>` (required): the image to convert
+- `[width]` (optional): the output width in characters; the default is 80
+
+Examples:
+
+```bash
+./ascii starry_night_400.pgm        # 80 characters wide
+./ascii starry_night_400.pgm 120    # wider, more detail
+./ascii starry_night_400.pgm 40     # smaller
+```
+
+A sample image is included: `starry_night_400.pgm`, a 400 × 317 grayscale version of *The Starry Night* by Vincent van Gogh.
+
+**OnlineGDB:** upload the `.pgm` file, then type the arguments (without `./ascii`) into the **Command line arguments** box, for example `starry_night_400.pgm 120`.
 
 ## How it works
 
-1. **Opens the file** with `std::ifstream` and stops with an error if the file can't be opened.
-2. **Reads the header**: the image type, width, height and maximum brightness. If the type isn't `P2`, it stops with an error.
-3. **Stores the pixels** in a 2D grid (`std::vector<std::vector<int>>`). A vector is used because the image size is only known when the program reads the file.
-4. **Calculates the output size**: the output is 80 characters wide, and the height is calculated from the image so the picture keeps its shape (see *Update: automatic resizing* below).
-5. **Averages each block**: every output character covers a small block of pixels. The program adds up all the pixels in the block and divides by how many there are.
+1. **Reads the command-line arguments**: the file name and the optional width, and checks they are valid.
+2. **Opens the file** with `std::ifstream` and stops with an error if the file can't be opened.
+3. **Reads the header**: the image type, width, height and maximum brightness. If the type isn't `P2`, it stops with an error.
+4. **Stores the pixels** in a 2D grid (`std::vector<std::vector<int>>`). A vector is used because the image size is only known when the program reads the file.
+5. **Calculates the output size**: the output width is 80 characters by default, or the width the user chose, and the height is calculated from the image so the picture keeps its shape (see *Update: automatic resizing* below).
+6. **Averages each block**: every output character covers a small block of pixels. The program adds up all the pixels in the block and divides by how many there are.
 6. **Turns each average into a character** from a string of characters ordered from dark to light:
    ```
    index = average * ramp.size() / (maxValue + 1)
@@ -100,12 +114,26 @@ row_scale    = height / outputHeight
 
 **Result:** *The Starry Night* (400 × 317) now prints as 80 × 31 characters with the right proportions, instead of 80 × 159.
 
+## Update: command-line options
+
+The file name and output width are no longer hard-coded. The program reads them from the command line through `main(int argc, char* argv[])`:
+
+- `argc` is the number of words typed, including the program name
+- `argv[0]` is the program name, `argv[1]` the file, `argv[2]` the width
+
+**Checks:**
+
+- **Wrong number of arguments:** if `argc` is not 2 or 3, the program prints `Usage: ./ascii <file.pgm> [width]` and stops. This check runs first, before `argv[1]` is used.
+- **Not a number:** every character of the width is checked with `isdigit`, so input like `hello`, `-20` or `120abc` is rejected. (`stoi("120abc")` would silently return 120, so this check is needed.)
+- **Too large for an `int`:** `stoi` is wrapped in `try` / `catch (...)`, so a value like `99999999999` gives an error message instead of a crash.
+- **Width below 1:** rejected with an error, since a width of 0 would cause division by zero.
+- **Width larger than the image:** capped to the image width (for example, `999` on a 400-pixel image gives 400).
+
 ## Future improvements
 
 This project will keep growing. Planned features:
 
-- **Command-line options**, for example `./ascii image.pgm 120`, so the output width isn't fixed at 80 *(next)*
-- **Invert option** for light and dark terminal backgrounds
+- **Invert option** (`--invert`) so the picture looks right on dark terminal backgrounds *(next)*
 - **Save the result** to a `.txt` file
 - **Color images**: support PPM files (`P3`) by converting each pixel's red, green and blue values to one brightness
 - **Binary formats**: support `P5` and `P6`, which most tools save by default
@@ -114,3 +142,4 @@ This project will keep growing. Planned features:
 ### Done
 
 - ~~**Automatic resizing**: any image size works~~ (see *Update: automatic resizing*)
+- ~~**Command-line options**: choose the file and width when running~~ (see *Update: command-line options*)
