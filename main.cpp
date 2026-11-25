@@ -22,7 +22,7 @@ int Start(int j, double scale) {
 
 int main() {
 	int counter(0);
-	ifstream myFile("starry_night_400.pgm");
+	ifstream myFile("starry_night.pgm");
 
 	if(!myFile.is_open()) {
 		cout<<"Could not open file";
